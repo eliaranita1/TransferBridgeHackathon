@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Orbitron&display=swap" rel="stylesheet">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Robotic Arm App</title>
+
+	<style>
+		@import 'ui/css/style.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>	
+
+</head>
+
+<body style = "background-color: lightblue">
+
+	<header style = "background-color: white">
+		<button class="back" ontouchstart="history.back()" style = 'background-color: navy;'>
+			<img src="res/left.png" />
+		</button>
+
+		<button id='disconnect' class="red small" ontouchstart="pressDisconnect()" disabled>Disconnect</button>
+
+		<img class="logotype" src="ui/images/logo.png" alt="Evothings" />
+	</header>
+
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="libs/evothings/easyble/easyble.js"></script>
+
+	<!-- START VIEW -->
+	<div id="startView" style = "background-color: lightblue">
+		<h1 style="text-align:center; 
+		-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black" >
+		Robotic Arm Bluetooth</h1>
+		
+		<div id= 'startwrapper'>
+			<img class="center" style="width:50%" src="teddybear.jpg" alt="robot arm" id='teddybear'>
+	
+			<button class="button green" id='start-scan' style='width: 100%;
+				text-shadow: -1px 0 lightblue, 0 1px lightblue, 1px 0 lightblue, 0 -1px lightblue;;
+				font-weight: bolder;
+				font-size: xx-large;
+				font-family: serif;
+				-webkit-text-fill-color: darkslateblue;' 
+				ontouchstart="pressStart()"> Start </button>
+			</div>
+		
+	</div>
+
+	<!-- CONTROL PANEL -->
+	<div id='controlsView' class='wrapper' style = 'display: none'>
+
+		<div class='button-group vertical'>
+			<p class='group-title'>Wrist</p>
+			<div class='data'></div>
+
+			<div class='button' id = 'wristcc' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('wristcc', WristTurnLeft)" ontouchend = "unpress('wristcc')">
+			 <img src = 'counterclockwise.png' height = '100%'>
+			</div>
+
+			<div class='button' id = 'wristc' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('wristc', WristTurnRight)" ontouchend = "unpress('wristc')">
+			 <img src = 'clockwise.png' height = '100%'>
+			</div> 
+		</div>
+
+		<div class='button-group vertical'>
+			<p class='group-title'>Elbow</p>
+			<div class='data'></div>
+
+			<div class='button' id = 'levelup' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('levelup', ElbowForward)" ontouchend = "unpress('levelup')">
+				UP
+			</div>
+
+			<div class='button' id = 'leveldown' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('leveldown', ElbowBackward)" ontouchend = "unpress('leveldown')">
+				DOWN
+			</div> 
+		</div>
+
+		<div class='button-group vertical'>
+			<p class='group-title'>Base</p>
+			<div class='data'></div>
+
+			<div class='button' id = 'forward' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('forward', BaseForward)" ontouchend = "unpress('forward')">
+				FWD
+			</div>
+
+			<div class='button' id = 'back' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('back', BaseBackward)" ontouchend = "unpress('back')">
+				BACK
+			</div> 
+		</div>
+
+		<div class='button-group vertical'>
+			<p class='group-title'>Shoulder</p>
+			<div class='data'></div>
+
+			<div class='button' id = 'up' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('up', ShoulderUp)" ontouchend = "unpress('up')">
+				UP
+			</div>
+
+			<div class='button' id = 'down' style = 'font-size: unset; background-color: skyblue;
+			-webkit-text-fill-color: gold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+			 ontouchstart = "pressButton('down', ShoulderDown)" ontouchend = "unpress('down')">
+				DOWN
+			</div>
+		</div>
+
+		<div id='center' class='center-wrapper'>
+			<div class='button-group'>
+				<div class='title-data-row'>
+					<p class='group-title'>Base</p>
+					<div class='data'></div>
+				</div>
+				<div class='horizontal'>
+					<div class='button' id = 'cclockwise' style = 'font-size: unset; background-color: skyblue;
+					-webkit-text-fill-color: gold; ' ontouchstart = "pressButton('cclockwise', BaseTurnLeft )"
+					ontouchend = "unpress('cclockwise')">
+							<img src = 'counterclockwise.png' height = '100%'>
+					</div>
+			
+					<div class='button' id = 'clockwise' style = 'font-size: unset; background-color: skyblue;
+					-webkit-text-fill-color: gold;' ontouchstart = "pressButton('clockwise', BaseTurnRight)" 
+					ontouchend = "unpress('clockwise')">
+							<img src = 'clockwise.png' height = '100%'>
+					</div>
+				</div>
+			</div>
+
+			<div class='button-group'>
+				<div class='title-data-row'>
+					<p class='group-title'>Grip</p>
+					<div class='data'></div>
+				</div>
+				<div class='horizontal'>
+					<div class='button' id = 'closebutton' style = 'font-size: unset; background-color: skyblue;
+					-webkit-text-fill-color: gold; 
+					text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black' 
+					ontouchstart = "pressButton('closebutton', Grip)" ontouchend = "unpress('closebutton')">
+						CLOSE
+					</div>
+			
+					<div class='button' id= 'openbutton' style = 'font-size: unset; background-color: skyblue;
+					-webkit-text-fill-color: gold; 
+					text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black' 
+					ontouchstart = "pressButton('openbutton', Release)" ontouchend = "unpress('openbutton')">
+						OPEN
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script src="app.js"></script>
+</body>
+
+</html>
+ 
